@@ -23,6 +23,8 @@ const Query = () => {
   // const [response3, setResponse3] = useState();
   const [loading, setLoading] = useState(false);
 
+  const [response, SetResponse] = useState(null);
+
   const [tab, setTab] = useState(1);
   const tabs = useRef(null);
 
@@ -79,6 +81,54 @@ const Query = () => {
     setUserInput("");
   };
 
+  const genReport = async (e) => {
+    e.preventDefault();
+    // console.log("The entered data is ", userInput);
+
+    // userInput is null
+    if (!userInput) {
+      console.log("Inside if");
+      toast({
+        title: "Invalid Input",
+        position: "bottom-right",
+        description: "Please fill the input field",
+        status: "success",
+        duration: 9000,
+        isClosable: true,
+      });
+    }
+
+    setLoading(true);
+    console.log("About to send a post request");
+    try {
+      const res = await fetch("http://127.0.0.1:8080/report", {
+        method: "POST",
+        headers: {
+          "Content-type": "text/plain",
+        },
+        body: userInput,
+      });
+      const data = await res.json();
+      console.log(data);
+      SetResponse(data);
+      // console.log("After the request");
+      // console.log("The data is ", data);
+      // console.log("Printing the object");
+      // console.log(data.result[0]);
+      // console.log(data.result[1]);
+      // console.log(data.result[2]);
+
+      // setResponse1(data);
+      // setResponse2(data);
+      // setResponse3(data.result[2]);
+    } catch (err) {
+      console.error(err.message);
+    }
+    console.log("Reponse returned");
+    setLoading(false);
+    setUserInput("");
+  };
+
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
       {/*  Site header */}
@@ -92,7 +142,7 @@ const Query = () => {
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className="pb-12 md:pb-20">
               {/* CTA box */}
-              <div className="relative bg-gray-900 rounded py-10 px-8 md:py-16 md:px-12 shadow-2xl overflow-hidden">
+              <div className="relative bg-gray-900 rounded py-10 px-8 md:py-16 md:px-12 shadow-2xl overflow-hidden w-full">
                 {/* Background illustration */}
                 <div
                   className="absolute right-0 bottom-0 pointer-events-none hidden lg:block"
@@ -181,34 +231,46 @@ const Query = () => {
                   </svg>
                 </div>
 
-                <div className="relative flex flex-col lg:flex-row justify-between items-center">
+                <div className="relative flex flex-col lg:flex-row justify-between items-center w-full">
                   {/* CTA content */}
                   <div className="text-center lg:text-left lg:max-w-xl">
-                    <h3 className="h3 text-white mb-2">
-                      Enter Email Contents
-                    </h3>
+                    <h3 className="h3 text-white mb-2">Enter Email Contents</h3>
                     <p className="text-gray-300 text-lg mb-6">
-                        Your Email contents will be analysed in detail and if there is fraud such as Financial scam, unwanted promotions 
-                        and other kind of scams based on links sent in the content it will be verified here.
+                      Your Email contents will be analysed in detail and if
+                      there is fraud such as Financial scam, unwanted promotions
+                      and other kind of scams based on links sent in the content
+                      it will be verified here.
                     </p>
 
                     {/* CTA form */}
                     <form className="w-full lg:w-auto">
-                      <div className="flex flex-col sm:flex-row justify-center max-w-xs mx-auto sm:max-w-md lg:mx-0">
-                        <input
+                      <div className="flex flex-col gap-4 justify-center max-w-xs mx-auto sm:max-w-md lg:mx-0">
+                        <textarea
                           value={userInput}
                           onChange={(e) => setUserInput(e.target.value)}
                           className="form-input w-full appearance-none bg-gray-800 border border-gray-700 focus:border-gray-600 rounded-sm px-4 py-3 mb-2 sm:mb-0 sm:mr-2 text-white placeholder-gray-500 focus:outline-none active:outline-none"
                           placeholder="Query..."
                           aria-label="Query..."
-                        />
+                          rows={10}
+                          cols={25}
+                        >
+                          {" "}
+                        </textarea>
                         {!loading ? (
-                          <button
-                            onClick={submitHandler}
-                            className="btn text-white bg-blue-600 hover:bg-blue-700 shadow"
-                          >
-                            Submit
-                          </button>
+                          <div className="flex gap-3">
+                            <button
+                              onClick={submitHandler}
+                              className="btn text-white bg-blue-600 hover:bg-blue-700 shadow"
+                            >
+                              Submit
+                            </button>
+                            <button
+                              onClick={genReport}
+                              className="btn text-white bg-blue-600 hover:bg-blue-700 shadow"
+                            >
+                              Report
+                            </button>
+                          </div>
                         ) : (
                           <button
                             disabled
@@ -259,36 +321,135 @@ const Query = () => {
           <div className="absolute left-0 right-0 m-auto w-px p-px h-20 bg-gray-200 transform -translate-y-1/2"></div>
 
           <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
-            <div className="pt-12 md:pt-20">
+            <div className="pt-12 md:pt-10">
               {/* Section header */}
-              <div className="max-w-3xl mx-auto text-center pb-12 md:pb-16 flex flex-col items-center">
-                <h1 className="h2 mb-4">Explore the solutions</h1>
-                <p className="text-xl text-gray-600 mb-7">
+              <h1 className="text-center h2 mb-4">Explore the solutions</h1>
+              {response !== null && (
+                <div className="max-w-3xl pb-12 md:pb-16 flex flex-col w-full">
+                  <div className="">
+                    <h1 className="text-2xl font-bold mb-3">Summary:</h1>
+                    <div className="flex flex-col items-start justify-center">
+                      {Object.keys(response.summary).map((key) => (
+                        <div className="flex items-center gap-2" key={key}>
+                          <h1 className="text-xl font-bold">{key}:</h1>
+                          <p className="font-normal text-lg">
+                            {response.summary[key]}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                    <hr></hr>
+
+                    <table className="table-auto w-full mt-12 border-2 border-gray-200 mb-10 p-5">
+                      <thead className="bg-[#333333] text-white font-bold" >
+                        <tr>
+                          <th className="px-4 py-2">
+                            Hop
+                          </th>
+                          <th className="px-4 py-2">From</th>
+                          <th className="px-4 py-2">By</th>
+                          <th className="px-4 py-2">With</th>
+                          <th className="px-4 py-2">Time (UTC)</th>
+                          <th className="px-4 py-2">Delay</th>
+                        </tr>
+                      </thead>
+                      <tbody className="">
+                        {Object.keys(response.data).map(
+                          (key) => (
+                            <tr className="border-2">
+                              <td className="text-center border-x-2 text-lg px-4 py-3">{key}</td>
+                              <td className="text-center border-x-2 text-lg px-4 py-3">{response.data[key].Direction[0]}</td>
+                              <td className="text-center border-x-2 text-lg px-4 py-3">{response.data[key].Direction[1]}</td>
+                              <td className="text-center border-x-2 text-lg px-4 py-3">{response.data[key].Direction[2]}</td>
+                              <td className="text-center border-x-2 text-lg px-4 py-3">{response.data[key].Time}</td>
+                              <td className="text-center text-lg px-4 py-3">{response.data[key].Delay}</td>
+                            </tr>
+                          )
+                        )}
+                      </tbody>
+                    </table>
+
+                    <h1 className="mt-5 font-bold text-xl mb-3">
+                      Security headers:
+                    </h1>
+                    <table className="table-auto w-full border-2 border-gray-200 mb-10">
+                      <tbody className="">
+                        {Object.keys(response.security_headers_dict).map(
+                          (key) => (
+                            <tr className="border-2" key={key}>
+                              <td className="p-4 border-x-2 text-lg font-bold">
+                                {key}
+                              </td>
+                              <td className="text-lg font-normal px-7 py-6">
+                                {response.security_headers_dict[key]}
+                              </td>
+                            </tr>
+                          )
+                        )}
+                      </tbody>
+                    </table>
+
+                    <h1 className="mt-5 font-bold text-xl mb-3">X-headers:</h1>
+                    <table className="table-auto w-full border-2 border-gray-200 mb-10">
+                      <tbody className="">
+                        {Object.keys(response.x_headers).map((key) => (
+                          <tr className="border-2" key={key}>
+                            <td className="p-4 border-x-2 text-lg font-bold">
+                              {key}
+                            </td>
+                            <td className="text-lg font-normal px-7 py-6">
+                              {response.x_headers[key]}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+
+                    <h1 className="mt-5 font-bold text-xl mb-3">
+                      Other headers:
+                    </h1>
+                    <table className="table-auto border-2 border-gray-200 mb-10">
+                      <tbody className="">
+                        {Object.keys(response.other_headers).map((key) => (
+                          <tr className="border-2" key={key}>
+                            <td className="p-4 border-x-2 text-lg font-bold">
+                              {key}
+                            </td>
+                            <td className="text-lg font-normal px-7 py-6">
+                              {response.other_headers[key]}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  {/* <p className="text-xl text-gray-600 mb-7">
                   Duis aute irure dolor in reprehenderit in voluptate velit esse
                   cillum dolore eu fugiat nulla pariatur excepteur sint occaecat
                   cupidatat.
-                </p>
-                {response1 && response2 && (
-                  <Box
-                    className="mt-9 min-h-[1000px] w-[1000px] "
-                    sx={{ 
-                      display: "flex",
-                      flexWrap: "wrap",
-                      "& > :not(style)": {
-                        m: 1,
-                        // width: 1000,
-                        // height: 1000,
-                      },
-                    }}
-                  >
-                    <Paper elevation={10} className="">
-                      <div className="p-10 text-2xl ">{response1.result}</div>
-                      <div className="p-10 text-2xl ">{response2.result}</div>
-                      {/* <div className="p-10 text-2xl "><p>Query3</p>{response3}</div> */}
-                    </Paper>
-                  </Box>
-                )}
-                {/* 
+                </p> */}
+
+                  {response1 && response2 && (
+                    <Box
+                      className="mt-9 min-h-[1000px] w-[1000px] "
+                      sx={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        "& > :not(style)": {
+                          m: 1,
+                          // width: 1000,
+                          // height: 1000,
+                        },
+                      }}
+                    >
+                      <Paper elevation={10} className="">
+                        <div className="p-10 text-2xl ">{response1.result}</div>
+                        <div className="p-10 text-2xl ">{response2.result}</div>
+                        {/* <div className="p-10 text-2xl "><p>Query3</p>{response3}</div> */}
+                      </Paper>
+                    </Box>
+                  )}
+                  {/* 
                 <button
                   className="-mt-[950px] h-12 w-14 flex justify-center items-center text-gray-600 hover:text-gray-900 bg-white hover:bg-white-100 rounded-full shadow transition duration-150 ease-in-out"
                   onClick={shareHandler}
@@ -302,7 +463,8 @@ const Query = () => {
                     <path d="M24 11.5c-.6.3-1.2.4-1.9.5.7-.4 1.2-1 1.4-1.8-.6.4-1.3.6-2.1.8-.6-.6-1.5-1-2.4-1-1.7 0-3.2 1.5-3.2 3.3 0 .3 0 .5.1.7-2.7-.1-5.2-1.4-6.8-3.4-.3.5-.4 1-.4 1.7 0 1.1.6 2.1 1.5 2.7-.5 0-1-.2-1.5-.4 0 1.6 1.1 2.9 2.6 3.2-.3.1-.6.1-.9.1-.2 0-.4 0-.6-.1.4 1.3 1.6 2.3 3.1 2.3-1.1.9-2.5 1.4-4.1 1.4H8c1.5.9 3.2 1.5 5 1.5 6 0 9.3-5 9.3-9.3v-.4c.7-.5 1.3-1.1 1.7-1.8z" />
                   </svg>
                 </button> */}
-              </div>
+                </div>
+              )}
 
               {/* Displaying the Response */}
 
