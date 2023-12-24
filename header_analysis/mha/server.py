@@ -221,7 +221,7 @@ def index():
         #     'index.html', data=r, delayed=delayed, summary=summary,
         #     n=n, chart=chart, security_headers=security_headers)
     
-        return jsonify({"data": r, "summary": summary, "security_headers_dict":security_headers_dict, "x_headers": x_headers, "other_headers": other_headers})
+        return jsonify({"data": r, "summary": summary, "security_headers_dict":security_headers_dict, "x_headers": x_headers, "other_headers": other_headers, "graph": graph, "total_delay": fTotalDelay})
     else:
         return render_template('index.html')
 
@@ -231,7 +231,7 @@ if __name__ == '__main__':
     parser.add_argument("-d", "--debug", action="store_true", default=False,
                         help="Enable debug mode")
     parser.add_argument("-b", "--bind", default="127.0.0.1", type=str)
-    parser.add_argument("-p", "--port", default="8080", type=int)
+    parser.add_argument("-p", "--port", default="8000", type=int)
     args = parser.parse_args()
 
     app.debug = args.debug

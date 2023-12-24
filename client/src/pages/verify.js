@@ -10,6 +10,9 @@ import Paper from "@mui/material/Paper";
 import { Box, TextField } from "@mui/material";
 import Link from "next/link";
 import { PaperClipIcon } from "@heroicons/react/20/solid";
+import { Bar } from "react-chartjs-2";
+import Chart from "@/components/Chart";
+import { data } from "autoprefixer";
 const myLoader = ({ src }) => {
   return `${src}`;
 };
@@ -24,6 +27,7 @@ const Query = () => {
   const [loading, setLoading] = useState(false);
 
   const [response, SetResponse] = useState(null);
+  const [chartData, setChartData] = useState(null);
 
   const [tab, setTab] = useState(1);
   const tabs = useRef(null);
@@ -81,6 +85,10 @@ const Query = () => {
     setUserInput("");
   };
 
+  useEffect(() => {
+    console.log(chartData);
+  }, [chartData]);
+
   const genReport = async (e) => {
     e.preventDefault();
     // console.log("The entered data is ", userInput);
@@ -101,7 +109,7 @@ const Query = () => {
     setLoading(true);
     console.log("About to send a post request");
     try {
-      const res = await fetch("http://127.0.0.1:8080/report", {
+      const res = await fetch("http://127.0.0.1:8000/report", {
         method: "POST",
         headers: {
           "Content-type": "text/plain",
@@ -111,6 +119,7 @@ const Query = () => {
       const data = await res.json();
       console.log(data);
       SetResponse(data);
+      
       // console.log("After the request");
       // console.log("The data is ", data);
       // console.log("Printing the object");
@@ -275,12 +284,12 @@ const Query = () => {
                           <button
                             disabled
                             type="button"
-                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 inline-flex items-center"
+                            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 inline-flex items-center"
                           >
                             <svg
                               aria-hidden="true"
                               role="status"
-                              class="inline w-4 h-4 mr-3 text-white animate-spin"
+                              className="inline w-4 h-4 mr-3 text-white animate-spin"
                               viewBox="0 0 100 101"
                               fill="none"
                               xmlns="http://www.w3.org/2000/svg"
@@ -327,25 +336,31 @@ const Query = () => {
               {response !== null && (
                 <div className="max-w-3xl pb-12 md:pb-16 flex flex-col w-full">
                   <div className="">
-                    <h1 className="text-2xl font-bold mb-3">Summary:</h1>
-                    <div className="flex flex-col items-start justify-center">
-                      {Object.keys(response.summary).map((key) => (
-                        <div className="flex items-center gap-2" key={key}>
-                          <h1 className="text-xl font-bold">{key}:</h1>
-                          <p className="font-normal text-lg">
-                            {response.summary[key]}
-                          </p>
+                    
+                      <div>
+                        <h1 className="text-2xl font-bold mb-3">Summary:</h1>
+                        <div className="flex flex-col items-start justify-center">
+                          {Object.keys(response.summary).map((key) => (
+                            <div className="flex items-center gap-2" key={key}>
+                              <h1 className="text-xl font-bold">{key}:</h1>
+                              <p className="font-normal text-lg">
+                                {response.summary[key]}
+                              </p>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                      
+                      <div className="mt-8">
+                        {response && <Chart graph={response.graph} total_delay={response.total_delay}/>}
+                      </div>                   
+
                     <hr></hr>
 
                     <table className="table-auto w-full mt-12 border-2 border-gray-200 mb-10 p-5">
-                      <thead className="bg-[#333333] text-white font-bold" >
+                      <thead className="bg-[#333333] text-white font-bold">
                         <tr>
-                          <th className="px-4 py-2">
-                            Hop
-                          </th>
+                          <th className="px-4 py-2">Hop</th>
                           <th className="px-4 py-2">From</th>
                           <th className="px-4 py-2">By</th>
                           <th className="px-4 py-2">With</th>
@@ -354,18 +369,28 @@ const Query = () => {
                         </tr>
                       </thead>
                       <tbody className="">
-                        {Object.keys(response.data).map(
-                          (key) => (
-                            <tr className="border-2">
-                              <td className="text-center border-x-2 text-lg px-4 py-3">{key}</td>
-                              <td className="text-center border-x-2 text-lg px-4 py-3">{response.data[key].Direction[0]}</td>
-                              <td className="text-center border-x-2 text-lg px-4 py-3">{response.data[key].Direction[1]}</td>
-                              <td className="text-center border-x-2 text-lg px-4 py-3">{response.data[key].Direction[2]}</td>
-                              <td className="text-center border-x-2 text-lg px-4 py-3">{response.data[key].Time}</td>
-                              <td className="text-center text-lg px-4 py-3">{response.data[key].Delay}</td>
-                            </tr>
-                          )
-                        )}
+                        {Object.keys(response.data).map((key) => (
+                          <tr className="border-2" key={key}>
+                            <td className="text-center border-x-2 text-lg px-4 py-3">
+                              {key}
+                            </td>
+                            <td className="text-center border-x-2 text-lg px-4 py-3">
+                              {response.data[key].Direction[0]}
+                            </td>
+                            <td className="text-center border-x-2 text-lg px-4 py-3">
+                              {response.data[key].Direction[1]}
+                            </td>
+                            <td className="text-center border-x-2 text-lg px-4 py-3">
+                              {response.data[key].Direction[2]}
+                            </td>
+                            <td className="text-center border-x-2 text-lg px-4 py-3">
+                              {response.data[key].Time}
+                            </td>
+                            <td className="text-center text-lg px-4 py-3">
+                              {response.data[key].Delay}
+                            </td>
+                          </tr>
+                        ))}
                       </tbody>
                     </table>
 
