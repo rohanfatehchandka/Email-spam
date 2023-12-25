@@ -1,8 +1,7 @@
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
 from flask_restful import Api
-from helpers import fact_check
+from helpers import fact_check  # Import the fact_check function from the helpers module
 import nltk
 
 import json
@@ -15,15 +14,15 @@ import json
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
+
 app = Flask(__name__)
 CORS(app)  # Initialize CORS for the entire app
 api = Api(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-nltk.download('punkt')
+nltk.download('punkt')  # Download the required nltk data
 
-
-
+# Load the URL spam classification dataset
 url = pd.read_csv('./data-set/url_spam_classification.csv')
 
 # Preprocess the data
@@ -34,7 +33,7 @@ url['is_spam'] = url['is_spam'].apply(lambda x: 1 if x == "True" else 0)
 urls = url.iloc[:, 0]
 ifSpam = url.iloc[:, 1]
 
-# Tokenization function
+# Tokenization function for URL extraction
 def extractUrl(data):
     url = str(data)
     extractSlash = url.split('/')
@@ -69,53 +68,28 @@ with open('nbModel.pkl', 'wb') as file:
 with open('nbModel.pkl', 'rb') as file:
     loaded_nbModel = pickle.load(file)
 
-
-
+# Route for predicting spam or not spam based on the input URL
 @app.route('/predict', methods=['POST'])
 @cross_origin()  # Enable CORS for this route
-
 def predict():
     if request.method == 'POST':
-        # url = request.form['url']
         data = request.get_json()
-
-        # a = json.loads(data)
-
-        # print(data[""])
-        resultret=[]
-        var= data["items"]
+        resultret = []
+        var = data["items"]
         for x in var:
-            
-            input_features = cv.transform([x])  # Use the same CountVectorizer used during training
-
-        # Use the loaded model for prediction
+            # Use the trained model to predict whether the URL is spam or not
+            input_features = cv.transform([x])
             prediction = loaded_nbModel.predict(input_features)
-
-        # Print the result
+            # Print the result
             result = "Spam" if prediction == 1 else "Not Spam"
             resultret.append(result)
             print("printing result")
             print(result)
-        # for urls in data["items"]:
-        # print(data)
-
-        # url = "http://mstats.dare2compete.com/CL0/https:%2F%2Funstop.com%2Fcompetitions%2F842520%2Fregister%3Futm_campaign=site-emails%26utm_medium=d2c-automated%26utm_source=request-to-join-your-team-for-appian-ai-application-challenge-being-organized-by-indian-institute-of-technology-iit-madras/1/0109018c90663b1c-10b00081-4340-431e-883b-f9d599f46629-000000/T0So0ywbGLucNd7m1GCmVDTgSIZLD_4ooocfvyWuR34=134"
-        # input_features = cv.transform([url])  # Use the same CountVectorizer used during training
-
-        # # Use the loaded model for prediction
-        # prediction = loaded_nbModel.predict(input_features)
-
-        # # Print the result
-        # result = "Spam" if prediction == 1 else "Not Spam"
-        # print("printing result")
-        # print(result)
-        # return render_template('result.html', result=result)
         return resultret
 
-# Authenticating a User Query
+# Route for authenticating a user query using the fact_check function
 @app.route('/factcheck', methods=['POST'])
 @cross_origin()  # Enable CORS for this route
-
 def verifier():
     print("Inside the verifier at the backend")
     data = request.get_data(as_text=True)
@@ -123,5 +97,6 @@ def verifier():
     result = fact_check(data)
     return jsonify({"result": result})
 
+# Run the Flask app if this script is executed
 if __name__ == "__main__":
     app.run(debug=True)

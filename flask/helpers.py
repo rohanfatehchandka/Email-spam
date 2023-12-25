@@ -1,42 +1,52 @@
+# Importing necessary libraries and modules
 import nltk
 from newspaper import Article 
 import openai
-import nltk
 import re
+
+# Downloading the 'punkt' resource for NLTK
 nltk.download('punkt')
 
+# Function to extract the summary of an article from a given URL
 def get_summary(url):
-    article=Article(url)
+    # Creating an Article object using the provided URL
+    article = Article(url)
     article.download()
     article.parse()
     article.nlp()
-    article_summary=article.summary 
+    article_summary = article.summary 
     return article_summary 
 
+# Function to interact with the GPT-3 model using OpenAI API
 def gpt3(text):
-    # openai.api_key='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'
-    openai.api_key='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'
+    # Setting the OpenAI API key
+    openai.api_key = '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'
+    
+    # Generating a response using the GPT-3 model
     response = openai.Completion.create(
-    model="text-davinci-003",
-    prompt=text,
-    temperature=0.3,
-    max_tokens=2000,
-    top_p=1.0,
-    frequency_penalty=0.0,
-    presence_penalty=1
+        model="text-davinci-003",
+        prompt=text,
+        temperature=0.3,
+        max_tokens=2000,
+        top_p=1.0,
+        frequency_penalty=0.0,
+        presence_penalty=1
     )
-    content=response.choices[0].text
+    
+    # Extracting and printing the content of the GPT-3 response
+    content = response.choices[0].text
     print(content)
-    return response.choices[0].text
+    return content
 
-def fact_check(text_peice):
-    topic=text_peice
-    query1=f"Based on the email header provided {topic} detect what email fraud it is .in a single word tell if it is spam or not and if spam then only give the category of spam as phishing or spoofing and if not spam return legitimate. Give the ip address of the sender and the location of that ip"
-    # query1=f"Categorize the email header in one word only from given below in these categories: Legitimate, Phishing, Spoofing, Malware, Trojan. Email Header : {topic}"
-    # query2="in a single word tell if it is spam or not and give the category of spam . Give the ip address of the sender and the location of that ip"
-    response1 = gpt3(query1)
-
-    # response2 = gpt3(query2)
-    print(response1)
-    # print(response2)
-    return response1
+# Function to perform fact-checking based on the email header
+def fact_check(text_piece):
+    # Setting the topic for fact-checking
+    topic = text_piece
+    
+    # Generating a GPT-3 prompt for fact-checking
+    query = f"Based on the email header provided {topic} detect what email fraud it is. In a single word, tell if it is spam or not. If spam, then only give the category of spam as phishing or spoofing. If not spam, return 'legitimate'. Give the IP address of the sender and the location of that IP."
+    
+    # Using the gpt3 function to get a response for fact-checking
+    response = gpt3(query)
+    print(response)
+    return response
