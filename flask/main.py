@@ -1,3 +1,20 @@
+'''
+Functions:
+extractUrl(data): Tokenization function for URLs.
+predict(): POST request handler for predicting if URLs are spam.
+verifier(): POST request handler for fact-checking user queries.
+
+Data Processing:
+Pandas DataFrame (url) for URL spam classification.
+
+Modeling:
+Multinomial Naive Bayes model (nbModel) for spam classification.
+Flask and CORS: Flask app (app) with CORS enabled.
+
+Routes:
+'/predict': Predicts if URLs are spam based on the trained model.
+'/factcheck': Fact-checks user queries using an external helper function.
+'''
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
 from flask_restful import Api

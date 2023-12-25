@@ -1,3 +1,32 @@
+'''
+Functions:
+getCountryForIP(line): Extracts country name for an IP address using regular expressions and IPy.
+duration(seconds, _maxweeks=99999999999):
+
+Formats seconds into a human-readable duration.
+dateParser(line):
+
+Parses a date from a line using dateutil.parser.
+getHeaderVal(h, data, rex='\s(.?)\n\S+:\s'):**
+
+Extracts header values from mail data using regular expressions.
+index():
+
+Main route for parsing email headers, generating reports, and returning a JSON response.
+Variables:
+app, reader, cors:
+
+Flask app, GeoIP2 database reader, and CORS configuration.
+Utility Functions:
+
+duration:
+Formats seconds into a human-readable duration.
+Execution:
+Uses command-line arguments for configuration (debug mode, host, and port).
+Routes:
+'/report':
+Main route for parsing email headers, generating reports, and returning a JSON response.
+'''
 from flask import Flask, jsonify
 from flask import render_template
 from flask import request
