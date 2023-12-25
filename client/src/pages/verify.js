@@ -55,16 +55,18 @@ const Query = () => {
         isClosable: true,
       });
     }
-
+    const v = userInput.slice(0, 3500);
+    console.log("userInput length: ", userInput.length);
+    console.log("v length: ", v.length);
     setLoading(true);
     console.log("About to send a post request");
     try {
-      const res = await fetch("http://localhost:5000/factcheck", {
+      const res = await fetch("http://127.0.0.1:5000/factcheck", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
         },
-        body: userInput,
+        body: v,
       });
       const data = await res.json();
       console.log("After the request");
@@ -323,18 +325,20 @@ const Query = () => {
 
         <section className="relative">
           {/* Section background (needs .relative class on parent and next sibling elements) */}
-          <div
-            className="absolute inset-0 bg-gray-100 pointer-events-none mb-16"
+          {/* <div
+            className="absolute inset-0  pointer-events-none mb-16"
             aria-hidden="true"
           ></div>
-          <div className="absolute left-0 right-0 m-auto w-px p-px h-20 bg-gray-200 transform -translate-y-1/2"></div>
-
-          <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="absolute left-0 right-0 m-auto w-px p-px h-20 bg-gray-200 transform -translate-y-1/2"></div> */}
+          {(response || response1) && (
+            <h1 className="text-center h2 mb-4">Email Forensic Report</h1>
+          )}
+          <div className="w-full">
             <div className="pt-12 md:pt-10">
               {/* Section header */}
-              <h1 className="text-center h2 mb-4">Explore the solutions</h1>
+
               {response !== null && (
-                <div className="max-w-3xl pb-12 md:pb-16 flex flex-col w-full">
+                <div className="px-10 pb-12 md:pb-16 flex flex-col w-full">
                   <div className="">
                     <div>
                       <h1 className="text-2xl font-bold mb-3">Summary:</h1>
@@ -360,139 +364,106 @@ const Query = () => {
                     </div>
 
                     <hr></hr>
-
-                    <table className="table-auto w-full mt-12 border-2 border-gray-200 mb-10 p-5">
-                      <thead className="bg-[#333333] text-white font-bold">
-                        <tr>
-                          <th className="px-4 py-2">Hop</th>
-                          <th className="px-4 py-2">From</th>
-                          <th className="px-4 py-2">By</th>
-                          <th className="px-4 py-2">With</th>
-                          <th className="px-4 py-2">Time (UTC)</th>
-                          <th className="px-4 py-2">Delay</th>
-                        </tr>
-                      </thead>
-                      <tbody className="">
-                        {Object.keys(response.data).map((key) => (
-                          <tr className="border-2" key={key}>
-                            <td className="text-center border-x-2 text-lg px-4 py-3">
-                              {key}
-                            </td>
-                            <td className="text-center border-x-2 text-lg px-4 py-3">
-                              {response.data[key].Direction[0]} <br />
-                              {response.data[key].country_name}
-                            </td>
-                            <td className="text-center border-x-2 text-lg px-4 py-3">
-                              {response.data[key].Direction[1]}
-                            </td>
-                            <td className="text-center border-x-2 text-lg px-4 py-3">
-                              {response.data[key].Direction[2]}
-                            </td>
-                            <td className="text-center border-x-2 text-lg px-4 py-3">
-                              {response.data[key].Time}
-                            </td>
-                            <td className="text-center text-lg px-4 py-3">
-                              {response.data[key].Delay}
-                            </td>
+                    <div className="overflow-x-auto">
+                      <table className="table-auto w-full overflow-scroll mt-12 border-2 border-gray-200 mb-10 p-5">
+                        <thead className="bg-[#333333] text-white font-bold">
+                          <tr>
+                            <th className="px-4 py-2">Hop</th>
+                            <th className="px-4 py-2">From</th>
+                            <th className="px-4 py-2">By</th>
+                            <th className="px-4 py-2">With</th>
+                            <th className="px-4 py-2">Time (UTC)</th>
+                            <th className="px-4 py-2">Delay</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody className="">
+                          {Object.keys(response.data).map((key) => (
+                            <tr className="border-2" key={key}>
+                              <td className="text-center border-x-2 text-base px-4 py-3">
+                                {key}
+                              </td>
+                              <td className="text-center border-x-2 text-base px-4 py-3">
+                                {response.data[key].Direction[0]} <br />
+                                {response.data[key].country_name}
+                              </td>
+                              <td className="text-center border-x-2 text-base px-4 py-3">
+                                {response.data[key].Direction[1]}
+                              </td>
+                              <td className="text-center border-x-2 text-base px-4 py-3">
+                                {response.data[key].Direction[2]}
+                              </td>
+                              <td className="text-center border-x-2 text-base px-4 py-3">
+                                {response.data[key].Time}
+                              </td>
+                              <td className="text-center text-base px-4 py-3">
+                                {response.data[key].Delay}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
 
                     <h1 className="mt-5 font-bold text-xl mb-3">
                       Security headers:
                     </h1>
-                    <table className="table-auto w-full border-2 border-gray-200 mb-10">
-                      <tbody className="">
-                        {Object.keys(response.security_headers_dict).map(
-                          (key) => (
-                            <tr className="border-2" key={key}>
-                              <td className="p-4 border-x-2 text-lg font-bold">
-                                {key}
-                              </td>
-                              <td className="text-lg font-normal px-7 py-6">
-                                {response.security_headers_dict[key]}
-                              </td>
-                            </tr>
-                          )
-                        )}
-                      </tbody>
-                    </table>
+                    <div className="overflow-x-auto">
+                      <table className="table-auto w-full overflow-x-auto border-2 border-gray-200 mb-10">
+                        <tbody className="">
+                          {Object.keys(response.security_headers_dict).map(
+                            (key) => (
+                              <tr className="border-2" key={key}>
+                                <td className="p-4 border-x-2 text-base font-bold">
+                                  {key}
+                                </td>
+                                <td className="text-base font-normal px-7 py-6">
+                                  {response.security_headers_dict[key]}
+                                </td>
+                              </tr>
+                            )
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
 
                     <h1 className="mt-5 font-bold text-xl mb-3">X-headers:</h1>
-                    <table className="table-auto w-full border-2 border-gray-200 mb-10">
-                      <tbody className="">
-                        {Object.keys(response.x_headers).map((key) => (
-                          <tr className="border-2" key={key}>
-                            <td className="p-4 border-x-2 text-lg font-bold">
-                              {key}
-                            </td>
-                            <td className="text-lg font-normal px-7 py-6">
-                              {response.x_headers[key]}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                    <div className="overflow-x-auto">
+                      <table className="table-auto w-full border-2 border-gray-200 mb-10">
+                        <tbody className="">
+                          {Object.keys(response.x_headers).map((key) => (
+                            <tr className="border-2" key={key}>
+                              <td className="p-4 border-x-2 text-base font-bold">
+                                {key}
+                              </td>
+                              <td className="text-base font-normal px-7 py-6">
+                                {response.x_headers[key]}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
 
                     <h1 className="mt-5 font-bold text-xl mb-3">
                       Other headers:
                     </h1>
-                    <table className="table-auto border-2 border-gray-200 mb-10">
-                      <tbody className="">
-                        {Object.keys(response.other_headers).map((key) => (
-                          <tr className="border-2" key={key}>
-                            <td className="p-4 border-x-2 text-lg font-bold">
-                              {key}
-                            </td>
-                            <td className="text-lg font-normal px-7 py-6">
-                              {response.other_headers[key]}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                    <div className="overflow-x-auto">
+                      <table className="table-auto border-2 border-gray-200 mb-10">
+                        <tbody className="">
+                          {Object.keys(response.other_headers).map((key) => (
+                            <tr className="border-2" key={key}>
+                              <td className="p-4 border-x-2 text-base font-bold">
+                                {key}
+                              </td>
+                              <td className="text-base font-normal px-7 py-6">
+                                {response.other_headers[key]}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                  {/* <p className="text-xl text-gray-600 mb-7">
-                  Duis aute irure dolor in reprehenderit in voluptate velit esse
-                  cillum dolore eu fugiat nulla pariatur excepteur sint occaecat
-                  cupidatat.
-                </p> */}
-
-                  {/* {response1 && response2 && (
-                    <Box
-                      className="mt-9 min-h-[1000px] w-[1000px] "
-                      sx={{
-                        display: "flex",
-                        flexWrap: "wrap",
-                        "& > :not(style)": {
-                          m: 1,
-                          
-                        },
-                      }}
-                    >
-                      <Paper elevation={10} className="">
-                        <div className="p-10 text-2xl ">{response1.result}</div>
-                        <div className="p-10 text-2xl ">{response2.result}</div>
-                        
-                      </Paper>
-                    </Box>
-                  )} */}
-
-                  {/* 
-                <button
-                  className="-mt-[950px] h-12 w-14 flex justify-center items-center text-gray-600 hover:text-gray-900 bg-white hover:bg-white-100 rounded-full shadow transition duration-150 ease-in-out"
-                  onClick={shareHandler}
-                  aria-label="Twitter"
-                >
-                  <svg
-                    className="w-8 h-8 fill-current"
-                    viewBox="0 0 32 32"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M24 11.5c-.6.3-1.2.4-1.9.5.7-.4 1.2-1 1.4-1.8-.6.4-1.3.6-2.1.8-.6-.6-1.5-1-2.4-1-1.7 0-3.2 1.5-3.2 3.3 0 .3 0 .5.1.7-2.7-.1-5.2-1.4-6.8-3.4-.3.5-.4 1-.4 1.7 0 1.1.6 2.1 1.5 2.7-.5 0-1-.2-1.5-.4 0 1.6 1.1 2.9 2.6 3.2-.3.1-.6.1-.9.1-.2 0-.4 0-.6-.1.4 1.3 1.6 2.3 3.1 2.3-1.1.9-2.5 1.4-4.1 1.4H8c1.5.9 3.2 1.5 5 1.5 6 0 9.3-5 9.3-9.3v-.4c.7-.5 1.3-1.1 1.7-1.8z" />
-                  </svg>
-                </button> */}
                 </div>
               )}
 
@@ -500,9 +471,13 @@ const Query = () => {
 
               {/* Section content */}
             </div>
-            {response1 && response2 && (
+          </div>
+
+          <div className="relative max-w-6xl -mt-11 mx-auto px-4 sm:px-6">
+            {!response && response1 && (
+              <div className="flex justify-center">
                 <Box
-                  className="mt-9 min-h-[1000px] w-[1000px] "
+                  className="mt-9 mb-9 w-[1000px] bg-gray-100"
                   sx={{
                     display: "flex",
                     flexWrap: "wrap",
@@ -515,13 +490,10 @@ const Query = () => {
                 >
                   <Paper elevation={10} className="">
                     <div className="p-10 text-2xl ">{response1}</div>
-
-                    
                   </Paper>
                 </Box>
-              )}
-
-            
+              </div>
+            )}
           </div>
         </section>
       </main>

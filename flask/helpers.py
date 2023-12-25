@@ -31,7 +31,7 @@ def gpt3(text):
 
 def fact_check(text_peice):
     topic=text_peice
-    query1=f"Based on the email header provided {topic} detect what email fraud it is .in a single word tell if it is spam or not and give the category of spam as phishing or spoofing or malware or trojan. Give the ip address of the sender and the location of that ip"
+    query1=f"Based on the email header provided {topic} detect what email fraud it is .in a single word tell if it is spam or not and if spam then only give the category of spam as phishing or spoofing and if not spam return legitimate. Give the ip address of the sender and the location of that ip"
     # query1=f"Categorize the email header in one word only from given below in these categories: Legitimate, Phishing, Spoofing, Malware, Trojan. Email Header : {topic}"
     # query2="in a single word tell if it is spam or not and give the category of spam . Give the ip address of the sender and the location of that ip"
     response1 = gpt3(query1)

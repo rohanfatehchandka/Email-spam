@@ -2,11 +2,8 @@ import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import HeroHome from "../components/HeroHome";
 import FeaturesHome from "../components/Features";
-import FeaturesBlocks from "../components/FeaturesBlocks";
-import Testimonials from "../components/Testimonials";
-import Newsletter from "../components/Newsletter";
 import Footer from "../components/Footer";
-import Banner from "../components/Banner";
+
 
 const Home = () => {
   const [hasMounted, setHasMounted] = useState(false);
@@ -28,12 +25,12 @@ const Home = () => {
       <Header />
 
       {/*  Page content */}
-      <main className="flex-grow">
+      <main className="flex-grow mb-16">
         {/*  Page sections */}
         <HeroHome />
         <FeaturesHome />
-        <FeaturesBlocks />
-        <Testimonials />
+        {/* <FeaturesBlocks />
+        <Testimonials /> */}
       </main>
 
       {/* <Banner /> */}

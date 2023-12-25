@@ -51,10 +51,10 @@ const Header = () => {
       <div className="max-w-6xl mx-auto px-5 sm:px-6">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Site branding */}
-          <div className="flex-shrink-0 mr-4">
+          <div className="flex-shrink-0 mr-4 flex gap-3 items-center">
             {/* Logo */}
             <Link href="/" className="block" aria-label="Cruip">
-              <svg
+              {/* <svg
                 className="w-8 h-8"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -80,8 +80,14 @@ const Header = () => {
                   fill="url(#header-logo)"
                   fillRule="nonzero"
                 />
-              </svg>
+              </svg> */}
+              <img src="Mail_Icon.jpg" className="w-12 h-12 rounded" />
             </Link>
+            {session && (
+              <>
+                Signed in as {session.user.email} <br />
+              </>
+            )}
           </div>
 
           {/* Site navigation */}
@@ -92,11 +98,7 @@ const Header = () => {
                   Home
                 </span>
               </Link>
-              <Link href="/admin/users">
-                <span className="font-medium text-gray-600 hover:text-gray-900 px-5 py-3 flex items-center transition duration-150 ease-in-out">
-                  Users
-                </span>
-              </Link>
+
               <li
                 href="/signup"
                 onClick={!session ? signIn : signOut}
