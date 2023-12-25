@@ -36,37 +36,26 @@ cors = CORS(resources={
 
 cors.init_app(app)
 
+# Function to get the country name for an IP address using regular expressions and IPy library
 def getCountryForIP(line):
-        # print('function called')
-        ipv4_address = re.compile(r"""
-            \b((?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)\.
-            (?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)\.
-            (?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)\.
-            (?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d))\b""", re.X)
-        ip = ipv4_address.findall(line)
-        if ip:
-            ip = ip[0]  # take the 1st ip and ignore the rest
-            # print('ip')
-            # print(ip)
-            if IP(ip).iptype() == 'PUBLIC':
-                r = reader.country(ip).country
-                # print('r')
-                # print(r)
-                if r.iso_code and r.name:
-                    # print("r.name")
-                    # print(r.name)
-                    return r.name
-    
-# @app.context_processor
-# def utility_processor():
-#                         # 'iso_code': r.iso_code.lower(),
-                        
-                    
-#     return getCountryForIP
+    ipv4_address = re.compile(r"""
+        \b((?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)\.
+        (?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)\.
+        (?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)\.
+        (?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d))\b""", re.X)
+    ip = ipv4_address.findall(line)
+    if ip:
+        ip = ip[0]  # take the 1st ip and ignore the rest
+        if IP(ip).iptype() == 'PUBLIC':
+            # Retrieve country information for the IP address using GeoIP2 database
+            r = reader.country(ip).country
+            if r.iso_code and r.name:
+                return r.name
 
-
+# Context processor for utility functions
 @app.context_processor
 def utility_processor():
+    # Function to format seconds into a human-readable duration
     def duration(seconds, _maxweeks=99999999999):
         return ', '.join(
             '%d %s' % (num, unit)
@@ -81,20 +70,18 @@ def utility_processor():
         )
     return dict(duration=duration)
 
-
+# Function to parse a date from a given line using dateutil.parser
 def dateParser(line):
     try:
         r = dateutil.parser.parse(line, fuzzy=True)
-
-    # if the fuzzy parser failed to parse the line due to
-    # incorrect timezone information issue #5 GitHub
     except ValueError:
+        # Fallback mechanism for cases where fuzzy parser fails due to incorrect timezone information
         r = re.findall('^(.*?)\s*(?:\(|utc)', line, re.I)
         if r:
             r = dateutil.parser.parse(r[0])
     return r
 
-
+# Function to extract header value from mail data using regular expressions
 def getHeaderVal(h, data, rex='\s*(.*?)\n\S+:\s'):
     r = re.findall('%s:%s' % (h, rex), data, re.X | re.DOTALL | re.I)
     if r:
@@ -102,7 +89,7 @@ def getHeaderVal(h, data, rex='\s*(.*?)\n\S+:\s'):
     else:
         return None
 
-
+# Generating Reports after Parsing
 @app.route('/report', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
@@ -225,12 +212,7 @@ def index():
 
         print("r")
         print(r)
-        # country_name = utility_processor().get('getCountryForIP', lambda line: None)(v)
-        # country_name2 = utility_processor().get('getCountryForIP', lambda line: None)(v2)
-        # print("country name")
-        # print(country_name)
-        # print("country name 2")
-        # print(country_name2)
+
         summary = {
             'From': n.get('From') or getHeaderVal('from', mail_data),
             'To': n.get('to') or getHeaderVal('to', mail_data),
@@ -245,10 +227,6 @@ def index():
         security_headers_dict = {header: n.get(header) or getHeaderVal(header, mail_data) for header in security_headers}
         x_headers = {key: value for key,value in n.items() if key.startswith('X-')}
         other_headers = {k: v for k,v in n.items() if k not in ['Received','Subject','From','To','Message-ID','CC','Date'] and k not in security_headers and not k.startswith('X-')}
-        # print(x_headers)
-        # return render_template(
-        #     'index.html', data=r, delayed=delayed, summary=summary,
-        #     n=n, chart=chart, security_headers=security_headers)
     
         return jsonify({"data": r, "summary": summary, "security_headers_dict":security_headers_dict, "x_headers": x_headers, "other_headers": other_headers, "graph": graph, "total_delay": fTotalDelay})
     else:
