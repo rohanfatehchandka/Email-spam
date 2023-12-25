@@ -29,16 +29,15 @@ app.app_context().push()
 cors = CORS(resources={
     r'/*': {
         'origins': [
-            'http://localhost:3002'
+            'http://localhost:3000'
         ]
     }
 })
 
 cors.init_app(app)
 
-@app.context_processor
-def utility_processor():
-    def getCountryForIP(line):
+def getCountryForIP(line):
+        # print('function called')
         ipv4_address = re.compile(r"""
             \b((?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)\.
             (?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)\.
@@ -47,14 +46,23 @@ def utility_processor():
         ip = ipv4_address.findall(line)
         if ip:
             ip = ip[0]  # take the 1st ip and ignore the rest
+            # print('ip')
+            # print(ip)
             if IP(ip).iptype() == 'PUBLIC':
                 r = reader.country(ip).country
+                # print('r')
+                # print(r)
                 if r.iso_code and r.name:
-                    return {
-                        'iso_code': r.iso_code.lower(),
-                        'country_name': r.name
-                    }
-    return dict(country=getCountryForIP)
+                    # print("r.name")
+                    # print(r.name)
+                    return r.name
+    
+# @app.context_processor
+# def utility_processor():
+#                         # 'iso_code': r.iso_code.lower(),
+                        
+                    
+#     return getCountryForIP
 
 
 @app.context_processor
@@ -100,8 +108,8 @@ def index():
     if request.method == 'POST':
         # mail_data = request.form['headers'].strip()
         mail_data = request.get_data(as_text=True).strip()
-        print('Type of mail_data is {0}'.format(type(mail_data)))
-        print(mail_data)
+        # print('Type of mail_data is {0}'.format(type(mail_data)))
+        # print(mail_data)
         r = {}
         n = HeaderParser().parsestr(mail_data)
         graph = []
@@ -201,7 +209,28 @@ def index():
         for i in graph:
             line_chart.add(i[0], i[1])
         chart = line_chart.render(is_unicode=True)
+        
+        list1 = []
+        for key, value in r.items():
+            if len(value['Direction']) >= 2:
+                first_item = value['Direction'][0]
+                
+                if first_item != '':
+                    print('first_item')
+                    print(first_item)
+                    country_name = getCountryForIP(first_item)
+                    value['country_name'] = country_name
+                else:
+                    value['country_name'] = ''
 
+        print("r")
+        print(r)
+        # country_name = utility_processor().get('getCountryForIP', lambda line: None)(v)
+        # country_name2 = utility_processor().get('getCountryForIP', lambda line: None)(v2)
+        # print("country name")
+        # print(country_name)
+        # print("country name 2")
+        # print(country_name2)
         summary = {
             'From': n.get('From') or getHeaderVal('from', mail_data),
             'To': n.get('to') or getHeaderVal('to', mail_data),
@@ -216,7 +245,7 @@ def index():
         security_headers_dict = {header: n.get(header) or getHeaderVal(header, mail_data) for header in security_headers}
         x_headers = {key: value for key,value in n.items() if key.startswith('X-')}
         other_headers = {k: v for k,v in n.items() if k not in ['Received','Subject','From','To','Message-ID','CC','Date'] and k not in security_headers and not k.startswith('X-')}
-        print(x_headers)
+        # print(x_headers)
         # return render_template(
         #     'index.html', data=r, delayed=delayed, summary=summary,
         #     n=n, chart=chart, security_headers=security_headers)

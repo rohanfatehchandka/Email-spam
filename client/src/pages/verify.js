@@ -70,12 +70,12 @@ const Query = () => {
       console.log("After the request");
       console.log("The data is ", data);
       console.log("Printing the object");
-      console.log(data.result[0]);
-      console.log(data.result[1]);
+      console.log(data.result);
+      console.log(data.result);
       // console.log(data.result[2]);
 
-      setResponse1(data);
-      setResponse2(data);
+      setResponse1(data.result);
+      setResponse2(data.result);
       // setResponse3(data.result[2]);
     } catch (err) {
       console.error(err.message);
@@ -119,7 +119,7 @@ const Query = () => {
       const data = await res.json();
       console.log(data);
       SetResponse(data);
-      
+
       // console.log("After the request");
       // console.log("The data is ", data);
       // console.log("Printing the object");
@@ -336,24 +336,28 @@ const Query = () => {
               {response !== null && (
                 <div className="max-w-3xl pb-12 md:pb-16 flex flex-col w-full">
                   <div className="">
-                    
-                      <div>
-                        <h1 className="text-2xl font-bold mb-3">Summary:</h1>
-                        <div className="flex flex-col items-start justify-center">
-                          {Object.keys(response.summary).map((key) => (
-                            <div className="flex items-center gap-2" key={key}>
-                              <h1 className="text-xl font-bold">{key}:</h1>
-                              <p className="font-normal text-lg">
-                                {response.summary[key]}
-                              </p>
-                            </div>
-                          ))}
-                        </div>
+                    <div>
+                      <h1 className="text-2xl font-bold mb-3">Summary:</h1>
+                      <div className="flex flex-col items-start justify-center">
+                        {Object.keys(response.summary).map((key) => (
+                          <div className="flex items-center gap-2" key={key}>
+                            <h1 className="text-xl font-bold">{key}:</h1>
+                            <p className="font-normal text-lg">
+                              {response.summary[key]}
+                            </p>
+                          </div>
+                        ))}
                       </div>
-                      
-                      <div className="mt-8">
-                        {response && <Chart graph={response.graph} total_delay={response.total_delay}/>}
-                      </div>                   
+                    </div>
+
+                    <div className="mt-8">
+                      {response && (
+                        <Chart
+                          graph={response.graph}
+                          total_delay={response.total_delay}
+                        />
+                      )}
+                    </div>
 
                     <hr></hr>
 
@@ -375,7 +379,8 @@ const Query = () => {
                               {key}
                             </td>
                             <td className="text-center border-x-2 text-lg px-4 py-3">
-                              {response.data[key].Direction[0]}
+                              {response.data[key].Direction[0]} <br />
+                              {response.data[key].country_name}
                             </td>
                             <td className="text-center border-x-2 text-lg px-4 py-3">
                               {response.data[key].Direction[1]}
@@ -454,7 +459,7 @@ const Query = () => {
                   cupidatat.
                 </p> */}
 
-                  {response1 && response2 && (
+                  {/* {response1 && response2 && (
                     <Box
                       className="mt-9 min-h-[1000px] w-[1000px] "
                       sx={{
@@ -462,18 +467,18 @@ const Query = () => {
                         flexWrap: "wrap",
                         "& > :not(style)": {
                           m: 1,
-                          // width: 1000,
-                          // height: 1000,
+                          
                         },
                       }}
                     >
                       <Paper elevation={10} className="">
                         <div className="p-10 text-2xl ">{response1.result}</div>
                         <div className="p-10 text-2xl ">{response2.result}</div>
-                        {/* <div className="p-10 text-2xl "><p>Query3</p>{response3}</div> */}
+                        
                       </Paper>
                     </Box>
-                  )}
+                  )} */}
+
                   {/* 
                 <button
                   className="-mt-[950px] h-12 w-14 flex justify-center items-center text-gray-600 hover:text-gray-900 bg-white hover:bg-white-100 rounded-full shadow transition duration-150 ease-in-out"
@@ -495,6 +500,28 @@ const Query = () => {
 
               {/* Section content */}
             </div>
+            {response1 && response2 && (
+                <Box
+                  className="mt-9 min-h-[1000px] w-[1000px] "
+                  sx={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    "& > :not(style)": {
+                      m: 1,
+                      // width: 1000,
+                      // height: 1000,
+                    },
+                  }}
+                >
+                  <Paper elevation={10} className="">
+                    <div className="p-10 text-2xl ">{response1}</div>
+
+                    
+                  </Paper>
+                </Box>
+              )}
+
+            
           </div>
         </section>
       </main>

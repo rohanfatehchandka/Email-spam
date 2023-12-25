@@ -4,7 +4,7 @@ module.exports = {
       {
         protocol: "https",
         hostname: "localhost",
-        port: "",
+        port: "3000",
         pathname: "/f90/**",
       },
     ],

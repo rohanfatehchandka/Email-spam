@@ -15,7 +15,7 @@ def get_summary(url):
 
 def gpt3(text):
     # openai.api_key='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'
-    openai.api_key='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'
+    openai.api_key='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'
     response = openai.Completion.create(
     model="text-davinci-003",
     prompt=text,
@@ -31,9 +31,11 @@ def gpt3(text):
 
 def fact_check(text_peice):
     topic=text_peice
-    query1=f"Based on the email header provided {topic} detect what email fraud it is .in a single word tell if it is spam or not and give the category of spam . Give the ip address of the sender and the location of that ip"
+    query1=f"Based on the email header provided {topic} detect what email fraud it is .in a single word tell if it is spam or not and give the category of spam as phishing or spoofing or malware or trojan. Give the ip address of the sender and the location of that ip"
+    # query1=f"Categorize the email header in one word only from given below in these categories: Legitimate, Phishing, Spoofing, Malware, Trojan. Email Header : {topic}"
     # query2="in a single word tell if it is spam or not and give the category of spam . Give the ip address of the sender and the location of that ip"
     response1 = gpt3(query1)
+
     # response2 = gpt3(query2)
     print(response1)
     # print(response2)

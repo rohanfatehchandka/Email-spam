@@ -53,7 +53,7 @@ def fact_check(text_peice):
     # query2="fact check this statement with statistics and official goverment sources "+topic+"and also provide other sources with links"
     query1=f"Based on the email header provided {topic} detect what email fraud it is .in a single word tell if it is spam or not and give the category of spam . Give the ip address of the sender and the location of that ip"
     # query2="in a single word tell if it is spam or not and give the category of spam . Give the ip address of the sender and the location of that ip"
-     gpt3(query1)
+    gpt3(query1)
     # gpt3(query2)
 
 fact_check(get_summary("https://www.inquirer.com/opinion/commentary/republicans-tennessee-expulsion-anti-democracy-20230409.html"))
